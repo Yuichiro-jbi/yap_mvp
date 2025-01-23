@@ -31,7 +31,7 @@ class _LearningPageState extends State<LearningPage> {
     },
     {
       'question': 'ビットコインのトランザクションは誰が承認する？',
-      'explanation': 'マイナーと呼ばれる参加者が取引を承認し、新しいブロックを生成します。',
+      'explanation': 'マイナーと呼ばれる参加者が取引を承認することで、新しいブロックを生成します。',
       'answers': ['銀行', '政府', 'マイナー', '開発者'],
       'correctAnswer': 'マイナー',
     },
