@@ -1,24 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../providers/islander_provider.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _navigateToTop();
+    _loadDataAndNavigate();
   }
 
-  Future<void> _navigateToTop() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    context.go('/top');
+  Future<void> _loadDataAndNavigate() async {
+    try {
+      // データを先読み
+      await ref.read(islanderProvider.future);
+      
+      // 最低3秒は表示
+      await Future.delayed(const Duration(seconds: 3));
+      
+      if (!mounted) return;
+      context.go('/top');
+    } catch (e) {
+      print('Error loading data: $e');
+      // エラー時も3秒後にトップページへ
+      await Future.delayed(const Duration(seconds: 3));
+      if (!mounted) return;
+      context.go('/top');
+    }
   }
 
   @override
