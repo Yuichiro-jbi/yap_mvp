@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../presentation/learning_page/pages/learning_page.dart';
 import '../presentation/my_page/pages/my_page.dart';
 import '../presentation/quiz_page/pages/quiz_list_page.dart';
 import '../presentation/splash_page/pages/splash_page.dart';
@@ -14,6 +15,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: '/lesson/:lessonNumber',
+        builder: (context, state) {
+          final lessonNumber = int.parse(state.pathParameters['lessonNumber']!);
+          return LearningPage(lessonNumber: lessonNumber);
+        },
       ),
       ShellRoute(
         builder: (context, state, child) {

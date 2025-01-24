@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../providers/islander_provider.dart';
+import '../../../services/lesson_service.dart';
 import '../../learning_page/pages/learning_page.dart';
 
 class TopPage extends ConsumerWidget {
@@ -10,6 +12,8 @@ class TopPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Islanderの状態を監視
     final islanderAsync = ref.watch(islanderProvider);
+    final lessonService = ref.watch(lessonServiceProvider.notifier);
+    final lessons = lessonService.getAllLessons();
 
     return Scaffold(
       appBar: AppBar(
@@ -55,32 +59,46 @@ class TopPage extends ConsumerWidget {
               ListView.builder(
                 padding: const EdgeInsets.all(16),
                 shrinkWrap: true,
-                itemCount: 6,
+                itemCount: lessons.length,
                 itemBuilder: (context, index) {
-                  final isLocked = index > 0;
+                  final lesson = lessons[index];
+                  // レッスンのアンロック状態を判定
+                  final isUnlocked = lessonService.isLessonUnlocked(
+                    lesson.lessonNumber,
+                    islander.learningProgress,
+                  );
+                  
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
-                      onTap: isLocked ? null : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const LearningPage(),
-                          ),
-                        );
-                      },
-                      tileColor: isLocked ? Colors.grey[100] : Theme.of(context).colorScheme.primaryContainer,
+                      onTap: isUnlocked ? () {
+                        context.push('/lesson/${lesson.lessonNumber}');
+                      } : null,
+                      tileColor: isUnlocked 
+                          ? Theme.of(context).colorScheme.primaryContainer 
+                          : Colors.grey[100],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       leading: Icon(
-                        isLocked ? Icons.lock : Icons.school,
-                        color: isLocked ? Colors.grey[600] : Theme.of(context).colorScheme.primary,
+                        isUnlocked ? Icons.school : Icons.lock,
+                        color: isUnlocked 
+                            ? Theme.of(context).colorScheme.primary 
+                            : Colors.grey[600],
                       ),
                       title: Text(
-                        'レッスン ${index + 1}',
+                        lesson.title,
                         style: TextStyle(
-                          color: isLocked ? Colors.grey[600] : Theme.of(context).colorScheme.primary,
+                          color: isUnlocked 
+                              ? Theme.of(context).colorScheme.primary 
+                              : Colors.grey[600],
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        lesson.description,
+                        style: TextStyle(
+                          color: isUnlocked ? null : Colors.grey[600],
                         ),
                       ),
                     ),

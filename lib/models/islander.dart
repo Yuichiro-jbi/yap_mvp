@@ -5,7 +5,7 @@ class Islander {
   final int sats;            // 獲得したSats
   final int loginDays;       // ログイン日数
   final DateTime createdAt;   // アカウント作成日
-  final int learningProgress; // 学習進捗
+  final int learningProgress; // 学習進捗（完了したレッスン数）
 
   const Islander({
     this.id,
@@ -35,8 +35,9 @@ class Islander {
     );
   }
 
-  // JSONからインスタンスを作成
+  // JSONからIslanderを生成するファクトリメソッド
   factory Islander.fromJson(Map<String, dynamic> json) {
+    print('Parsing JSON: $json'); // デバッグ用
     return Islander(
       id: json['id'] as String?,
       exp: json['exp'] as int,
@@ -47,7 +48,7 @@ class Islander {
     );
   }
 
-  // JSONに変換
+  // IslanderをJSONに変換するメソッド
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -59,14 +60,14 @@ class Islander {
     };
   }
 
-  // 初期値を持つインスタンスを作成
+  // 初期値を持つファクトリコンストラクタ
   factory Islander.initial() {
     return Islander(
       exp: 0,
       sats: 0,
       loginDays: 1,
       createdAt: DateTime.now(),
-      learningProgress: 0,
+      learningProgress: 0, // 初期値を0に変更
     );
   }
 }
