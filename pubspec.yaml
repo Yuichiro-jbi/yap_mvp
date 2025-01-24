@@ -38,6 +38,7 @@ dependencies:
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1
   intl: ^0.18.1  # 日付フォーマット用
+  go_router: ^13.0.1  # ルーティング用
 
 dev_dependencies:
   flutter_test:
