@@ -157,7 +157,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                                       .updateLearningProgress(widget.lessonNumber);
                                   // EXPの加算（新規クリア時のみ）
                                   await ref.read(islanderProvider.notifier)
-                                      .updateExp(current.exp + lesson.exp);
+                                      .updateExp(current.exp + lesson.exp.toInt());
                                 }
                                 Navigator.of(context).pop();
                               }
