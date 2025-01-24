@@ -1,7 +1,6 @@
 // Islanderの基本的なデータ構造を定義するファイル
 class Islander {
   final String? id;           // Supabase用のID（nullableなので?をつける）
-  final String? islanderId;   // 認証済みユーザーのID
   final int exp;             // 経験値
   final int sats;            // 獲得したSats
   final int loginDays;       // ログイン日数
@@ -10,7 +9,6 @@ class Islander {
 
   const Islander({
     this.id,
-    this.islanderId,
     required this.exp,
     required this.sats,
     required this.loginDays,
@@ -21,7 +19,6 @@ class Islander {
   // コピーメソッド
   Islander copyWith({
     String? id,
-    String? islanderId,
     int? exp,
     int? sats,
     int? loginDays,
@@ -30,7 +27,6 @@ class Islander {
   }) {
     return Islander(
       id: id ?? this.id,
-      islanderId: islanderId ?? this.islanderId,
       exp: exp ?? this.exp,
       sats: sats ?? this.sats,
       loginDays: loginDays ?? this.loginDays,
@@ -43,7 +39,6 @@ class Islander {
   factory Islander.fromJson(Map<String, dynamic> json) {
     return Islander(
       id: json['id'] as String?,
-      islanderId: json['islander_id'] as String?,
       exp: json['exp'] as int,
       sats: json['sats'] as int,
       loginDays: json['login_days'] as int,
@@ -56,7 +51,6 @@ class Islander {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'islander_id': islanderId,
       'exp': exp,
       'sats': sats,
       'login_days': loginDays,

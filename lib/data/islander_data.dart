@@ -4,7 +4,7 @@ import '../models/islander.dart';
 class IslanderData {
   final SupabaseClient _supabase;
   // このIDはislander_idとして使用
-  static const _testIslanderId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  static const _testIslanderId = '0e76015d-0406-4ebf-920b-dd53e7a0dce6';
 
   IslanderData(this._supabase);
 
@@ -13,7 +13,7 @@ class IslanderData {
       final response = await _supabase
           .from('islanders')
           .select()
-          .eq('islander_id', _testIslanderId)  // islander_idで検索
+          .eq('id', _testIslanderId)  // islander_idで検索
           .single();
       
       print('Supabase Response: $response'); // デバッグ用
@@ -35,7 +35,7 @@ class IslanderData {
           .from('islanders')
           .upsert({
             ...islander.toJson(),
-            'islander_id': _testIslanderId,  // islander_idを設定
+            'id': _testIslanderId,  // islander_idを設定
           })
           .select()
           .single();
