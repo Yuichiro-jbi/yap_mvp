@@ -1,611 +1,219 @@
-# Flutter プロジェクト開発指示書（100点バージョン）
+Flutterプロジェクト開発指示書（100点版）
+1. 前提条件
+あなたはFlutterフレームワークの専門家
+Widgetライフサイクル、アニメーション、レイアウトに精通していること。
+あなたはDart言語のエキスパート
+非同期処理、クラス設計、extension、Mixinなどを自在に活用できること。
+あなたはネイティブアプリ開発の実務経験者
+iOS/Android両プラットフォームでのUI/UX・パフォーマンス最適化に知見があること。
+あなたはUI/UXデザインの知見を有する者
+Flutter独自のレイアウト原則（コンポーズ的思考）を理解し、ユーザー体験を最適化できること。
+解説、説明は必ず日本語で行うこと
+指導者として世界一流でとても厳しいが、わからない部分があれば丁寧にフォローする
+2. 開発スタイル・ルール
+Riverpodを必ず使用して状態管理を行う
 
-## 1. 開発者の役割と期待スキル
+UIが状態の責務を持ちすぎないよう、ref.watch / ref.readを用いてProviderから状態を取得・操作する形に統一。
+Providerの種類はStateProvider, StateNotifierProvider, FutureProvider, StreamProviderなどを用途に応じて選択。
+Consumerのみを使用し、ConsumerWidgetは使用しない
 
-* Flutterフレームワーク（3.x 以降）とDart言語（Null Safety）を世界一のレベルで熟知していること。Framework内部の動作原理まで完全に理解していること
-* iOS/Androidなどネイティブアプリ開発の実務経験がある
-* UI/UXデザインやアクセシビリティを考慮して実装できる
-* Riverpodを活用して、拡張性・保守性・テスト容易性の高い状態管理を構築できる
-* クリーンアーキテクチャにより、機能ごとの責務分割を明確に行える
-* CI/CD（例: GitHub Actions, Bitrise）やGitフローの運用経験は必須
+Widgetツリー内で Consumer(builder: (context, ref, child) { ... }) を使い、そこで ref.watch(...) 等を行う。
+画面全体が巨大にならないように、小分割のConsumerを使い可読性を担保。
+ConsumerWidgetは使用禁止とし、チーム全体でコードスタイルを揃える。
+MVPフェーズではRepositoryを作らない
 
-## 2. プロジェクトの目標
+はじめはProviderに直接ロジックを書き込む形でシンプルに実装する。
+APIやDBなどの外部リソースアクセスが必要になったら、まずProviderに直書きでOK。
+後に機能拡張や複雑化した際、RepositoryやUseCase/Serviceを切り出すリファクタリングを行う。
+UI（画面）はStatelessWidgetを推奨
 
-* 提供されたデザインモックアップや画像をもとに、Flutter/Dartでクロスプラットフォーム対応のアプリを完成させる
-* Flavor（dev, staging, production）を単一の main.dart で --dart-define 等を用いて切り替える
-* 機能ごとのディレクトリ分割を徹底し、Riverpodとクリーンアーキテクチャで保守性を最大化する
-* パフォーマンス（60FPS, メモリ最適化, バッテリー配慮）・アクセシビリティ・セキュリティ・テスト容易性を満たす完成度を目指す
+アニメーションなどでStatefulWidgetが必要な場合を除き、極力StatelessWidgetにする。
+UIローカルな一時的状態（フォーム入力中など）はStatefulWidgetで持つ程度に留め、ビジネスロジックや永続的な状態はProviderで一元化する。
+ファイル命名・クラス命名規則
 
-## 3. ディレクトリ構成：機能（Feature）単位で分割
+UI: ○○Screen / ○○Page / ○○View
+Provider: ○○Provider (変数名), ○○Notifier (クラス名)
+Model: User / Item / UserModel などパスカルケース。
+Repository: （MVP中は作らないが、将来的には）○○Repository, ○○RepositoryImpl
+3. ディレクトリ構造 (MVP想定)
+MVP段階では、Repositoryを用意しないため、以下のようにシンプルな構成でスタートしてください。
+将来的にリソースアクセスが増えた場合、repository/ や usecase/ フォルダを追加し、ロジックを段階的に切り出す方針です。
 
-### 3.1 ディレクトリ階層
+arduino
+コピーする
+編集する
+lib/
+ ┣ main.dart
+ ┣ presentation/
+ ┃  ┣ home/
+ ┃  ┃  ┣ home_screen.dart
+ ┃  ┃  ┗ widgets/
+ ┃  ┣ login/
+ ┃  ┃  ┣ login_screen.dart
+ ┃  ┃  ┗ widgets/
+ ┃  ┗ common/
+ ┃     ┗ widgets/
+ ┣ provider/
+ ┃  ┣ home_provider.dart
+ ┃  ┗ login_provider.dart
+ ┗ model/
+    ┣ user.dart
+    ┗ item.dart
+ディレクトリの主な役割
+presentation/
 
-```
-yap_island/
-├── android/
-├── ios/
-├── lib/
-│   ├── main.dart
-│   ├── app.dart
-│   ├── config/
-│   │   ├── flavor_config.dart
-│   │   └── environment.dart
-│   ├── core/
-│   │   ├── exceptions/
-│   │   ├── usecases/
-│   │   ├── utils/
-│   │   └── ...
-│   ├── data/
-│   │   ├── datasources/
-│   │   │   └── supabase_data_source.dart
-│   │   ├── models/
-│   │   ├── repositories/
-│   │   └── ...
-│   ├── domain/
-│   │   ├── entities/
-│   │   ├── repositories/
-│   │   ├── usecases/
-│   │   └── ...
-│   ├── presentation/
-│   │   ├── shared/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   ├── top_page/
-│   │   │   ├── pages/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   ├── learning_page/
-│   │   │   ├── pages/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   ├── quiz_page/
-│   │   │   ├── pages/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   ├── treasure_page/
-│   │   │   ├── pages/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   ├── my_page/
-│   │   │   ├── pages/
-│   │   │   ├── widgets/
-│   │   │   └── providers/
-│   │   └── splash_page/
-│   │       ├── pages/
-│   │       └── widgets/
-│   ├── resources/
-│   │   └── strings.dart (多言語対応を将来的に想定)
-│   └── ...
-├── test/
-│   ├── unit/
-│   ├── widget/
-│   └── integration/
-├── analysis_options.yaml
-├── pubspec.yaml
-└── ```
+画面(UI)関連のディレクトリ。
+Consumerを使ってProviderから状態を取得し、Widgetを描画。
+widgets/ サブフォルダに細かいWidgetを入れ、○○_screen.dartには画面全体の構造・レイアウトのみ記述。
+provider/
 
-### ポイント
-* 機能単位で pages/, widgets/, providers/ をまとめる（home/, login/ 等）
-* 共通で使うWidgetやProvider、テーマ関連、翻訳などは shared/ に配置
-* i18n（多言語対応）がある場合は、core/i18n/ や l10n/ 等のディレクトリに arb ファイルや翻訳クラスを置く
-* テーマやダークモード対応を行う場合は themes/ ディレクトリで共通化
+RiverpodのProviderやStateNotifierを定義。
+DBやAPIアクセスも一時的にこの層に集約（MVPフェーズではここに書いてOK）。
+画面に対する操作（例: login(), fetchItems(), logout(), postComment() など）のエントリポイントとなるメソッドを用意。
+model/
 
-## 4. Flavor切り替え戦略（単一 main.dart）
+アプリで扱うデータモデルを定義（User, Itemなど）。
+JSONとの変換や、簡単なバリデーション・copyWithメソッドなどを記述。
+(注) repository/ フォルダはMVPでは作成しないが、後のステップで必要になったら下記のように追加する予定
 
-### 4.1 main.dart でのエントリーポイント
+コピーする
+編集する
+┣ repository/
+┃   ┣ user_repository.dart
+┃   ┗ user_repository_impl.dart
+4. 実装例（Consumerのみを使用）
+main.dart
+dart
+コピーする
+編集する
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'presentation/home/home_screen.dart';
 
-```dart
 void main() {
-  const flavorName = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  FlavorConfig.setup(flavorName);
-  runApp(MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
-```
 
-* flutter run --flavor dev --dart-define=FLAVOR=dev などでFlavorを指定
-* FlavorConfig でFlavor判定と設定を切り替える
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-### 4.2 FlavorConfig
-
-```dart
-enum Flavor { dev, staging, production }
-
-class FlavorConfig {
-  static late Flavor flavor;
-  static late String appName;
-  static late String baseUrl;
-  // 必要に応じてAPI_KEY, FEATURE_FLAGなども追加
-  
-  static void setup(String flavorName) {
-    switch (flavorName) {
-      case 'dev':
-        flavor = Flavor.dev;
-        appName = 'MyApp (Dev)';
-        baseUrl = 'https://dev.example.com/api';
-        break;
-      case 'staging':
-        flavor = Flavor.staging;
-        appName = 'MyApp (Staging)';
-        baseUrl = 'https://staging.example.com/api';
-        break;
-      case 'production':
-      default:
-        flavor = Flavor.production;
-        appName = 'MyApp';
-        baseUrl = 'https://production.example.com/api';
-        break;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'MVP App',
+      home: HomeScreen(),
+    );
   }
 }
-```
-
-### 4.3 ネイティブ設定（Android/iOS）
-
-* Android: android/app/build.gradle の productFlavors でアプリIDやバージョン名を切り替える
-* iOS: Runner.xcworkspace(Xcode) の Schemes で dev, staging, production 用に設定
-* これらネイティブ設定と --dart-define=FLAVOR=xxx を合わせてビルド・実行
-
-## 5. コーディング規約
-
-### 5.1 基本ルール
-
-#### コード品質とドキュメント
-* すべてのコードに必ず意図を説明するコメントを付与すること：
-  - 各クラス・メソッドの役割と責務
-  - 複雑なロジックの説明
-  - パフォーマンスに影響を与える実装の理由
-  - 将来の保守開発者が理解できる詳細な説明
-  - 特に重要な箇所には必ずコードの意図と理由を記載
-  - 非自明な実装の場合、なぜその実装を選択したのかの理由も必ず記載
-
-* Dart（Null Safety）を使用
-* クリーンアーキテクチャ（プレゼンテーション、ドメイン、データの三層分割）
-* Riverpod で状態管理（hooks_riverpodの利用も可）
-* コードの静的解析: flutter analyze でエラー/警告なしを維持
-* 自動整形: dart format（flutter format）を使用
-* UI変更に関する絶対的な制約：
-  - 既存のUIデザインは特に指示がない限り絶対に変更禁止
-  - 機能追加や修正時も、既存のレイアウト・デザイン・アニメーションは厳密に維持
-  - UIに影響を与える可能性のある変更は、必ず事前に承認を得ること
-  - デザイン変更の要望がある場合は、必ず明確な指示を仰ぐこと
-
-命名規則:
-* クラス名: UpperCamelCase
-* 変数・メソッド: lowerCamelCase
-* 定数: UPPERCASE_WITH_UNDERSCORE
-* プライベート: _privateMember
-* ファイル名: snake_case
-
-### 5.2 静的解析・Lintルール
-
-```yaml
-include: package:flutter_lints/flutter.yaml
-analyzer:
-  exclude:
-    - 'build/**'
-  errors:
-    missing_return: error
-    unused_import: error
-    # 必要に応じて設定
-```
-
-## 6. Widget実装規則
-
-* 機能単位（例: home/pages/, home/widgets/, home/providers/）に配置
-* build() メソッドは50行以内を目標
-* レイアウトが複雑な場合はWidgetを細分化して階層を3層以内に抑える
-* 大規模リストはListView.builderやLazy loadingの概念を導入
-* RiverpodのConsumer / Providerを必要な範囲で適切に使い、不要なリビルドを防止
-
-## 7. i18n（多言語対応）とTheming（テーマ）
-
-* 多言語対応が必要な場合は、Flutterのflutter_localizationsやintlを利用し、l10nディレクトリで.arbファイルを管理
-* テーマやダークモードは、presentation/shared/themes/ に theme_data.dart 等を置き、MaterialApp で切り替え
-* ユーザが設定でテーマを選択できる場合は、Riverpod で選択状態を保持する
-* カラーコントラストやフォントサイズの拡大にも対応し、アクセシビリティを担保
-
-## 8. 画像処理
-
-* Image.asset / Image.network にセマンティクスラベル必須
-* 画像は遅延読み込み・キャッシュ等でパフォーマンスを最適化
-* ファイルサイズ・フォーマットを意識し、メモリ使用量を抑制
-
-## 9. エラーハンドリング & ログ
-
-* try-catch や独自例外クラスを適切に使用
-* ユーザ向けエラーはUIでわかりやすいメッセージを表示
-* デバッグ・エラーログは Logger パッケージやCrashlytics / Sentry との連携で記録
-* Null Safetyを活用し、null例外を極力抑制
-* アサーション(assert)を活用し、開発時に想定外の動作を早期検知
-* ネットワーク接続エラーや通信エラーの場合は、必ずWebの404/500ページ相当の専用エラー画面を表示すること。この画面には以下を必ず含めること：
-  - エラーの種類とわかりやすい説明
-  - ユーザーが取るべき行動（再試行、設定確認など）の明確な指示
-  - 必要に応じてサポート窓口への誘導
-  - リトライボタンやホーム画面への戻るボタンなどの代替アクション
-
-## 10. テスト
-
-* 単体テスト（Unit Test）: test/unit/
-* Widgetテスト: UIの重要部分を中心に test/widget/
-* インテグレーションテスト: ログイン・API連携など主要フローを test/integration/
-* テストカバレッジ80%以上を目標（重要箇所は100%）
-* CIで flutter test --coverage を実行し、lcov レポートやHTMLレポートを生成
-* Mockingに mockito や mocktail を利用し、外部依存を切り離す
-
-## 11. パフォーマンス要件
-
-* 画面遷移時に60FPSを維持（アニメーション含む）
-* メモリ使用量をモニタリング（DevToolsなど）して不要なオブジェクト作成を抑制
-* バッテリー消費を考慮し、無駄なバックグラウンド処理や過度なアニメーションを避ける
-* DevToolsのPerformanceタブ、Timelineプロファイラを活用してボトルネックを解析
-
-## 12. アクセシビリティ
-
-* SemanticsラベルやsemanticLabelを適切に付与し、スクリーンリーダー対応
-* コントラスト比を考慮した配色（WCAG 2.0 AA基準など）
-* フォントサイズの可変やヒット領域拡大など、ユーザの操作性を高める工夫
-
-## 13. セキュリティ
-
-* 機密情報（APIキー等）はハードコード禁止。--dart-define や .env 等から取得
-* HTTPS通信必須（証明書ピンニングを検討）
-* 入力値の検証をクライアント・サーバ両面で実施
-* ソースコードやリポジトリに秘密鍵やトークンを含めない（.gitignore などで管理）
-* (必要に応じて) ソース難読化やリバースエンジニアリング対策も検討
-
-## 14. 依存パッケージ管理（pubspec.yaml）
-
-* バージョンは極力範囲指定 (^x.x.x) で管理し、互換性とアップデートを両立
-* 重大なバージョン更新があれば CHANGELOG.md に記載
-* 自動アップデートのリスクを避けるため、pubspec.lock をリポジトリに含めてバージョン整合性を維持
-
-## 15. 成果物の提出
-
-* ソースコード（GitHubリポジトリ）: mainブランチが常にリリース可能
-* テスト結果レポート（CI/CDログ, カバレッジレポート）
-* パフォーマンス測定結果（DevToolsのプロファイルなど）
-* 技術文書（実装詳細, API仕様, CI/CD手順, 環境構築ガイド, Flavor切り替え例）
-* Artifacts（dev, staging, production のapk/aab/ipa 等）
-* CHANGELOG.md：すべてのバージョンの変更履歴を必ず詳細に記録・管理すること
-
-## 16. レビュー基準
-
-* コーディング規約・Lint（analysis_options.yaml）への準拠を必須とする
-* 機能単位のディレクトリ構成・Riverpod設計を必ず適切に実装すること
-* テストカバレッジ80%以上を必ず達成すること
-* パフォーマンス（FPS, メモリ使用量, バッテリー）の要件を必ず満たすこと
-* セキュリティ対策（APIキー管理, HTTPS通信, 入力値検証など）を必ず実装すること
-* アクセシビリティ（スクリーンリーダー, コントラスト比等）を必ず考慮し実装すること
-* 単一のmain.dartでのFlavor切り替えを必ず正常に実装すること
-* ログインフローなどのインテグレーションテストを必ず網羅的に実装すること
-* リリース手順（CI/CD）・Artifactsの作成を必ず自動化すること
-
-## 17. CI/CDパイプラインと運用
-
-### 17.1 CI設定
-
-GitHub Actions (例)
-* on: [pull_request, push] で発火
-* ジョブ内で flutter pub get, flutter analyze, flutter test --coverage, flutter build ... を実行
-* Bitrise や Codemagic, GitLab CI 等、他サービスでも同様に設定
-
-### 17.2 CD（継続的デリバリー）
-
-* dev/staging/production 各Flavorごとにビルドを走らせ、テストクリア後にapk/aab/ipaをArtifactsとしてアップロード
-* リリース作業を自動/半自動化し、人的ミスを最小限に抑える
-
-### 17.3 Gitフロー
-
-* main ブランチ: 常にリリース可能状態
-* develop ブランチ: 最新の開発版（必要に応じて）
-* 機能開発は feature/xxx ブランチで実装 → PR → コードレビュー
-* リリース前は release/x.x.x ブランチで最終テスト → 問題なければ main へマージ・タグ付け
-
-### 17.4 コードレビュー
-
-* Pull Request単位でレビュー
-* lint, test, coverage など自動チェックをクリアしないとマージできない仕組み（branch protection）
-* PRの説明には何をどう変更したか明確に記載し、スクリーンショットやGIFでUI変更点を共有
-
-## 18. 補足: スケーラビリティと将来拡張
-
-* アプリが大規模化しても、機能単位のディレクトリ構成を守ることで保守性を維持
-* モジュール分割やパッケージ分割（例えば Flutterのmelosを使うマルチパッケージ構成）を検討すると、さらに拡大可能
-* GraphQL や gRPC に対応する場合も、data/datasources/配下に追加し、抽象化（Repositoryパターン）でUI層から隔離
-* オフライン対応（キャッシュ機能）や通知機能追加なども、機能フォルダを新設し、それぞれに pages/, widgets/, providers/ を揃える
-
-## 19. 開発フローと実装順序
-
-### 19.1 開発の基本原則
-機能開発を3フェーズで実施：
-
-1. Phase 1: 骨組み実装
-   - 最小限のUI要素実装
-   - 基本的な画面遷移フロー
-   - シンプルなエラー表示
-   - データモデル定義
-   - モックデータ準備
-
-2. Phase 2: バックエンド連携
-   - Supabase API連携
-   - 状態管理実装
-   - エラーハンドリング
-   - データの永続化
-   - 単体テスト
-
-3. Phase 3: UI改善・最適化
-   - UIの完成度向上
-   - アニメーション実装
-   - アクセシビリティ対応
-   - パフォーマンス最適化
-   - E2Eテスト
-
-### 開発ルール
-- 各フェーズは承認を得てから次に進む
-- フェーズの混在は避ける
-- 機能追加時はPhase 1から開始
-- 問題発生時は前フェーズに戻り修正
-
-### 想定する成果物
-1. Phase 1
-   - 基本画面レイアウト
-   - 画面遷移フロー
-   - モックデータ表示
-   - 基本エラー画面
-
-2. Phase 2
-   - API通信実装
-   - データモデル実装
-   - エラー処理
-   - ユニットテスト
-
-3. Phase 3
-   - 完成度の高いUI
-   - スムーズな動作
-   - 品質テスト結果
-   - ストア申請準備
-
-この3フェーズ方式により、早期の問題発見と段階的な品質向上が可能になります。
-
-# 20. アプリケーション仕様要件
-
-20.1 基本情報
-* アプリケーション名：ヤップ アイランド
-* 対象プラットフォーム：iOS / Android
-* 最小対応OSバージョン：
-  - iOS: 14.0以上
-  - Android: API Level 24 (Android 7.0)以上
-* 対応言語：
-  - リリース時：日本語のみ
-  - 将来対応：英語・その他言語（アプリ内で多言語化設計を実装）
-* 画面方向：縦型固定（Web・タブレット対応を想定した拡張性あり）
-* オフライン動作：不要（オンライン必須、将来的に検討）
-
-20.2 必須機能一覧
-
-20.2.1 認証・アカウント管理
-* ログイン方式
-  - SMS認証（外部認証システム）
-  - Supabase標準Authテーブル不使用(外部認証システムで認証後にauthテーブルで管理できれば使用したい)
-  - 外部SMS認証完了後に独自テーブルでIslander情報を管理
-* アカウント登録フロー
-  - SMSコード認証完了 → Supabase独自テーブルにIslander登録
-* 認証方式
-  - パスワードレス（SMSコードのみ）
-  - パスワードリセット機能不要
-* プロフィール情報
-  - Islander ID
-  - ニックネーム
-  - アイコン画像
-  - 学習進捗
-  - 連続アクセス日数
-
-20.2.2 ポイントシステム（「sats」）
-* ポイント種別
-  - sats：ビットコイン最小単位を報酬として付与
-  - exp：学習進捗を示す経験値
-* sats付与タイミング
-  - 広告視聴
-  - デイリークイズミッションクリア
-  - ログインボーナス（1日1回）
-* exp付与タイミング
-  - 学習コンテンツ（クイズ含む）クリア時
-* ビジネスモデル
-  - 将来：外部ウォレット連携、換金、広告収益との連携を検討
-
-20.2.3 基本機能
-* スプラッシュページ
-  - ロゴ＋アプリ名を中央表示
-  - 3秒後にトップページへ遷移
-* トップページ（双六型UI）
-  - duolingo風のマス目UI
-  - 上部バーに保有sats、exp表示
-  - 解放済みマスのみタップ可能
-  - クリアごとに次マスを解放
-* 学習コンテンツページ
-  - クイズ形式の学習
-  - exp付与システム
-  - プログレスバーによる進行度表示
-  - Supabase独自テーブルからデータ取得
-* クイズページ（デイリーミッション）
-  - 1日数問限定
-  - クリア報酬としてsats付与
-* 宝箱ページ
-  - 保有sats表示
-  - 円換算表示
-  - 総獲得sats表示
-  - ビットコイン価格推移チャート（fl_chart使用）
-* マイページ
-  - Islander ID表示
-  - 連続アクセス日数表示
-  - プロフィール編集機能
-  - sats引き出し機能（外部ウォレット送金）
-  - 各種設定（ログアウト、通知、テーマ）
-
-20.3 画面仕様
-
-20.3.1 共通UI要件
-* ステータスバー/ナビゲーションバー：テーマカラー準拠
-* 下部メニューバー：4つのタブ（トップ、クイズ、宝箱、マイページ）
-* ローディング表示：API通信・データ読み込み時
-* エラー表示：スナックバー or ダイアログ
-
-20.3.2 画面別仕様
-* スプラッシュページ
-  - 中央配置のロゴ＋アプリ名
-  - 3秒後自動遷移
-* トップページ
-  - 上部バー（sats/exp表示）
-  - 双六型マス目UI
-  - マス目のロック/解放システム
-* 学習コンテンツページ
-  - クイズ/説明表示
-  - プログレスバー
-  - exp獲得システム
-* クイズページ
-  - 日次制限付きクイズ
-  - sats報酬システム
-* 宝箱ページ
-  - sats関連情報表示
-  - BTCチャート表示
-* マイページ
-  - Islander情報表示
-  - 各種設定機能
-  - ウォレット連携機能
-
-20.4 Supabase連携仕様
-
-20.4.1 テーブル構造
-* 独自テーブル設計（islanders, contents, quizzes, points等）
-* SDK利用によるCRUD操作
-* SMS認証完了後のIslander登録フロー
-
-20.4.2 通信要件
-* タイムアウト：5～10秒
-* リトライ：1回＋リトライUI
-* キャッシュ：24時間有効期限
-
-20.5 データ保存要件
-
-20.5.1 ローカルストレージ
-* 保存データ
-  - Islander認証状態
-  - 言語設定
-  - 連続アクセス日数
-* セキュリティ：Secure Storage使用
-* 容量制限：数MB以内
-
-20.6 デザインワークフロー
-
-20.6.1 カラーリング・テーマ
-* 基本背景色
-  - ライトモード: #FFFFFF
-  - ダークモード: #000000
-* ボタンカラー
-  - 背景: #FFA616
-  - テキスト: #FFFFFF
-* 文字色
-  - ライトモード: #000000
-  - ダークモード: #FFFFFF
-  - 強調: #FFA616 or #FF4B4C
-
-20.6.2 UIパーツ実装手順
-* デザインデータ解析
-* Flutter Widget化
-* ThemeDataによる管理
-* 最適化とフィードバック
-
-20.6.3 画像リソース最適化
-* 遅延読み込み実装
-* キャッシュ制御
-* メモリ効率化
-* 描画パフォーマンス最適化
-
-# 21. Supabase データベース テーブル構造
-
-## 1. islanders テーブル
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | Islander固有のID |
-| phone_number | text | SMS認証に使用した電話番号（ユニーク制約推奨） |
-| nickname | text | ユーザーのニックネーム |
-| icon_url | text | プロフィールアイコン画像URL（null許容） |
-| consecutive_days | integer | 連続アクセス日数 |
-| sats_balance | bigint | 現在保有しているsatsの残高 |
-| exp | bigint | 現在の経験値 |
-| created_at | timestamptz | レコード作成日時（デフォルトCURRENT_TIMESTAMP） |
-| updated_at | timestamptz | レコード更新日時（デフォルトCURRENT_TIMESTAMP） |
-
-備考: phone_number にユニーク制約をかけ、SMS認証とのひも付けを行う
-
-## 2. contents テーブル (学習コンテンツ)
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | コンテンツ固有のID |
-| title | text | コンテンツタイトル |
-| description | text | コンテンツの概要や説明文 |
-| content_type | text | コンテンツ種別 (e.g. "lesson", "quiz_section", etc.) |
-| total_questions | integer | 問題数 (クイズ形式の場合に使用) |
-| section_number | integer | セクション番号（1,2,3） |
-| button_number | integer | セクション内のボタン番号 |
-| created_at | timestamptz | 作成日時 |
-| updated_at | timestamptz | 更新日時 |
-
-備考: 学習ページ向けに表示する内容を格納する。クイズ内包型にするか、quizzes テーブルと分けるか要検討
-
-## 3. quizzes テーブル (クイズ問題本体)
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | クイズ問題のID |
-| question | text | 問題文 |
-| answers | jsonb | 選択肢 (複数の回答候補をJSON形式で保持) |
-| correct_answer | text | 正解回答 (もしくはindexをjsonに含める) |
-| explanation | text | 解説文 (null許容) |
-| created_at | timestamptz | 作成日時 |
-| updated_at | timestamptz | 更新日時 |
-
-備考: デイリーミッション用クイズと学習用クイズを統合するか、分割するかは要件次第
-
-## 4. points テーブル (ポイント獲得/消費ログ)
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | ポイントログのID |
-| islander_id (FK) | uuid | islanders.id への外部キー |
-| point_type | text | "sats" or "exp" などの種別 |
-| amount | bigint | 加減する数量 (正の値:獲得 / 負の値:消費) |
-| reason | text | 理由 (e.g. "daily_quiz", "ad_reward", "lesson_clear", etc.) |
-| created_at | timestamptz | ログ作成日時 |
-
-備考: Islanderがポイントを得る/使う履歴を管理する
-
-## 5. transactions テーブル (satsの外部送金管理例)
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | 送金トランザクションID |
-| islander_id (FK) | uuid | islanders.idへの外部キー |
-| to_wallet_address | text | 送金先のBTCウォレットアドレス |
-| sats_amount | bigint | 送金するsats数 |
-| status | text | 送金ステータス ("pending", "completed", "failed"等) |
-| created_at | timestamptz | 作成日時 |
-| updated_at | timestamptz | 更新日時 |
-
-備考: 将来的に外部ウォレット連携する際に使用する。内部で承認・送金処理を行い、結果を更新
-
-## 6. daily_missions テーブル (例：デイリーミッション管理)
-
-| カラム | 型 | 説明 |
-|--------|------|------|
-| id (PK) | uuid | デイリーミッションID |
-| islander_id (FK) | uuid | islanders.idへの外部キー |
-| quiz_id (FK) | uuid | quizzes.idへの外部キー (どの問題が対象か) |
-| date | date | ミッション実施日 |
-| is_cleared | boolean | ミッションをクリアしたか (true/false) |
-| created_at | timestamptz | 作成日時 |
-| updated_at | timestamptz | 更新日時 |
-
-備考: デイリークイズの進捗を管理し、一度クリアしたミッションを重複して報酬受取しないようにするなどで活用
+home_screen.dart (UI例)
+dart
+コピーする
+編集する
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../provider/home_provider.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Consumerで細かい範囲に区切って状態監視を行う
+    return Scaffold(
+      appBar: AppBar(title: const Text('Home')),
+      body: Consumer(
+        builder: (context, ref, child) {
+          final itemsAsync = ref.watch(homeItemsProvider);
+          return itemsAsync.when(
+            data: (items) => ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (_, i) => ListTile(
+                title: Text(items[i].title),
+              ),
+            ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, st) => Text('Error: $err'),
+          );
+        },
+      ),
+      floatingActionButton: Consumer(
+        builder: (context, ref, child) {
+          return FloatingActionButton(
+            onPressed: () => ref.read(homeItemsProvider.notifier).refreshItems(),
+            child: const Icon(Icons.refresh),
+          );
+        },
+      ),
+    );
+  }
+}
+home_provider.dart (Provider例)
+dart
+コピーする
+編集する
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../model/item.dart';
+
+final homeItemsProvider =
+    StateNotifierProvider<HomeItemsNotifier, AsyncValue<List<Item>>>((ref) {
+  return HomeItemsNotifier();
+});
+
+class HomeItemsNotifier extends StateNotifier<AsyncValue<List<Item>>> {
+  HomeItemsNotifier() : super(const AsyncValue.loading()) {
+    _fetchItems();
+  }
+
+  Future<void> _fetchItems() async {
+    try {
+      // MVPフェーズ：ダミーデータを直接取得
+      await Future.delayed(const Duration(seconds: 1));
+      final dummyData = [Item('Apple'), Item('Banana'), Item('Cherry')];
+      state = AsyncValue.data(dummyData);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> refreshItems() async {
+    state = const AsyncValue.loading();
+    await _fetchItems();
+  }
+}
+item.dart (Model例)
+dart
+コピーする
+編集する
+class Item {
+  final String title;
+  Item(this.title);
+}
+5. 運用ルール
+新しい画面を追加する場合
+
+presentation/○○/○○_screen.dart に画面実装。
+必要な状態管理は provider/○○_provider.dart に作成する。
+Consumerを使い、UIと状態管理を分離。
+Consumerの粒度を意識する
+
+大きな画面全体に1つのConsumerではなく、UIパーツごとに分割して可読性を上げる。
+ただしConsumerWidgetは使用しない。必ずConsumer(builder: ...)を活用すること。
+RepositoryやUseCaseへの切り出しはMVP実装後
+
+必要になったタイミングでrepository/フォルダやusecase/フォルダを追加し、
+DBアクセスやAPIコール
+複雑なビジネスロジック
+を外部クラスに切り出す。
+MVP中はProviderにまとめてOK。後のリファクタリングを前提に実装する。
+ネーミング・ディレクトリ構成を乱さない
+
+必ず上記の命名規則に従い、迷ったらチームリーダーに相談。
+大幅な変更をするときはコードレビュー・全体MTGを通す。
+UIは画面の見た目やユーザー操作のみを担当
+
+データロジック、認証ロジック、CRUD操作などはProviderに書く。
+StatelessWidgetを原則とし、どうしても必要なときだけStatefulWidgetを使う。
+6. 今後の拡張について
+API接続やDB操作が本格化すると、Providerのコードが肥大化する可能性があります。
+その段階で**Repository（データアクセス専用）やUseCase/Service（ビジネスロジック専用）**を切り出し、Providerは「状態管理」と「UIからのイベント受付」に集中させる形にリファクタしてください。
+テストが増える際は、「Providerのユニットテスト」「UseCaseのユニットテスト」「UIテスト」を切り分けやすくなるよう、段階的にレイヤー分割していくのが理想です。
