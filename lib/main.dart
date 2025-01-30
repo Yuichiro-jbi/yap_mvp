@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'router/app_router.dart';
+import 'presentation/common/widgets/main_scaffold.dart';
+import 'presentation/home/home_screen.dart';
+import 'presentation/profile/profile_screen.dart';
 import 'presentation/theme/app_theme.dart';
 
 void main() {
@@ -16,12 +18,17 @@ class MyApp extends StatelessWidget {
       builder: (context, ref, child) {
         final theme = ref.watch(appThemeProvider);
         
-        return MaterialApp.router(
-          routerConfig: appRouter,
+        return MaterialApp(
           title: 'YAP',
           theme: theme.lightTheme,
           darkTheme: theme.darkTheme,
           debugShowCheckedModeBanner: false,
+          home: const MainScaffold(
+            screens: [
+              HomeScreen(),
+              ProfileScreen(),
+            ],
+          ),
         );
       },
     );

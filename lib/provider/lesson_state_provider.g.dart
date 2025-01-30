@@ -7,7 +7,7 @@ part of 'lesson_state_provider.dart';
 // **************************************************************************
 
 String _$lessonStateNotifierHash() =>
-    r'bb00877691c52ea3f43d3ca907ce745404e76163';
+    r'b5e21f9217c67ebf2c4e15f07596460f2c73d14d';
 
 /// See also [LessonStateNotifier].
 @ProviderFor(LessonStateNotifier)
