@@ -8,7 +8,7 @@ import 'widgets/islander_stats_header.dart';
 import 'widgets/lesson_card.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,6 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final lesson = lessons[index];
                     final isCompleted = islander.completedLessonIds.contains(lesson.id);
-                    // 前のレッスンが完了していて、かつレッスンが最初のレッスンでない場合
                     final canStart = index == 0 ||
                         islander.completedLessonIds.contains(
                           lessons[index - 1].id
@@ -42,14 +41,16 @@ class HomeScreen extends StatelessWidget {
                     return LessonCard(
                       lesson: lesson,
                       isCompleted: isCompleted,
-                      isAvailable: canStart,
-                      onTap: canStart ? () {
-                        GoRouter.of(context).pushNamed(
-                          AppRoute.lesson.name,
-                          pathParameters: {'id': lesson.id},
-                          extra: lesson,
-                        );
-                      } : null,
+                      isLocked: !canStart,
+                      onTap: () {
+                        if (canStart) {
+                          GoRouter.of(context).pushNamed(
+                            AppRoute.lesson.name,
+                            pathParameters: {'id': lesson.id},
+                            extra: lesson,
+                          );
+                        }
+                      },
                     );
                   },
                 );
