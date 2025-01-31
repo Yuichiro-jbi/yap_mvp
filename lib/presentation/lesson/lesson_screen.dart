@@ -30,11 +30,27 @@ class LessonScreen extends StatelessWidget {
           return Column(
             children: [
               // プログレスバー
-              LinearProgressIndicator(
-                value: (lessonState.currentQuestionIndex + 1) / lesson.questions.length,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.primary,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 360,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFFE5E5E5),
+                      ),
+                    ),
+                    Container(
+                      width: 360 * ((lessonState.currentQuestionIndex + 1) / lesson.questions.length),
+                      height: 16,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // 問題番号表示
