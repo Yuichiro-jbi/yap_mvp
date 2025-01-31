@@ -50,10 +50,10 @@ class AppTheme {
   /// ライトモードのカラースキーム
   ColorScheme get _lightColorScheme {
     return ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E88E5), // メインカラー
-      primary: const Color(0xFF1E88E5),
-      secondary: const Color(0xFFFFB300), // 報酬やアチーブメント用
-      tertiary: const Color(0xFF00BFA5), // アクセントカラー
+      seedColor: const Color(0xFFFFB300), // ビットコインカラー
+      primary: const Color(0xFFFFB300),
+      secondary: const Color(0xFF1E88E5), // 以前のメインカラーを secondary に
+      tertiary: const Color(0xFF00BFA5),
       surface: Colors.white,
       background: const Color(0xFFF5F5F5),
       error: const Color(0xFFE53935),
@@ -63,10 +63,10 @@ class AppTheme {
   /// ダークモードのカラースキーム
   ColorScheme get _darkColorScheme {
     return ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E88E5),
+      seedColor: const Color(0xFFFFB300),
       brightness: Brightness.dark,
-      primary: const Color(0xFF1E88E5),
-      secondary: const Color(0xFFFFB300),
+      primary: const Color(0xFFFFB300),
+      secondary: const Color(0xFF1E88E5),
       tertiary: const Color(0xFF00BFA5),
       surface: const Color(0xFF424242),
       background: const Color(0xFF212121),

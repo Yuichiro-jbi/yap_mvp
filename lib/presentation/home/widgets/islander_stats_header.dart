@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../model/islander.dart';
+import 'package:yap_mvp/model/islander.dart';
 
 class IslanderStatsHeader extends StatelessWidget {
   final Islander islander;

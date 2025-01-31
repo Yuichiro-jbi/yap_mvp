@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../model/lesson.dart';
 
-class LessonCard extends StatelessWidget {
+class LessonCard extends StatefulWidget {
   final Lesson lesson;
   final VoidCallback onTap;
   final bool isCompleted;
@@ -16,122 +16,115 @@ class LessonCard extends StatelessWidget {
   });
 
   @override
+  State<LessonCard> createState() => _LessonCardState();
+}
+
+class _LessonCardState extends State<LessonCard> {
+  bool isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: isLocked ? 1 : 2,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: InkWell(
-        onTap: isLocked ? null : onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              _buildIcon(context),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lesson.title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: isLocked
-                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      lesson.description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: isLocked
-                            ? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5)
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (!isLocked) ...[
-                      const SizedBox(height: 8),
-                      _buildRewards(context),
-                    ],
-                  ],
+    return GestureDetector(
+      onTap: widget.isLocked ? null : widget.onTap,
+      onTapDown: (_) => setState(() => isPressed = true),
+      onTapUp: (_) => setState(() => isPressed = false),
+      onTapCancel: () => setState(() => isPressed = false),
+      child: SizedBox(
+        width: 70,
+        height: 65,
+        child: Stack(
+          children: [
+            // 影の部分
+            Positioned(
+              left: 0,
+              top: 28.50,
+              child: Container(
+                width: 70,
+                height: 16, 
+                decoration: BoxDecoration(
+                  color: !isPressed ? (widget.isLocked ? const Color(0xFFAAAAAA) : const Color(0x33000000)) : Colors.transparent,
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
                 ),
               ),
-              if (!isLocked && isCompleted)
-                Icon(
-                  Icons.check_circle,
-                  color: Theme.of(context).colorScheme.primary,
+            ),
+            // メインのボタン
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 100),
+              left: 0,
+              top: isPressed ? 8 : 0,
+              child: Container(
+                width: 70,
+                height: 57,
+                decoration: ShapeDecoration(
+                  color: widget.isLocked
+                      ? const Color(0xFF888888)
+                      : (widget.isCompleted ? const Color(0xFF58CC02) : const Color(0xFF58CC02)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(31.75),
+                  ),
+                  shadows: !isPressed ? [
+                    BoxShadow(
+                      color: widget.isLocked
+                          ? const Color(0xFF888888)
+                          : const Color(0xFF58CC02),
+                      blurRadius: 0,
+                      offset: const Offset(0, 8),
+                      spreadRadius: 0,
+                    ),
+                    const BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 0,
+                      offset: Offset(0, 8),
+                      spreadRadius: 0,
+                    ),
+                  ] : null,
                 ),
-            ],
-          ),
+                child: Center(
+                  child: _buildButtonContent(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildIcon(BuildContext context) {
+  Widget _buildButtonContent() {
+    if (widget.isCompleted) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.star,
+            color: Color(0xFF58CC02),
+            size: 24,
+          ),
+        ),
+      );
+    }
+    
+    if (widget.isLocked) {
+      return const Icon(
+        Icons.lock,
+        color: Colors.white,
+        size: 28,
+      );
+    }
+
+    // アクティブなボタン
     return Container(
-      width: 48,
-      height: 48,
+      width: 14,
+      height: 14,
       decoration: BoxDecoration(
-        color: _getIconBackgroundColor(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(
-        isLocked ? Icons.lock : (isCompleted ? Icons.check_circle : Icons.play_arrow),
-        color: _getIconColor(context),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(2),
       ),
     );
-  }
-
-  Widget _buildRewards(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          Icons.star,
-          color: Theme.of(context).colorScheme.primary,
-          size: 16,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '+${lesson.experienceReward}exp',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Icon(
-          Icons.currency_bitcoin,
-          color: Theme.of(context).colorScheme.secondary,
-          size: 16,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '+${lesson.coinReward} sats',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.secondary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _getIconBackgroundColor(BuildContext context) {
-    if (isLocked) {
-      return Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5);
-    }
-    return isCompleted
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.primaryContainer;
-  }
-
-  Color _getIconColor(BuildContext context) {
-    if (isLocked) {
-      return Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5);
-    }
-    return isCompleted
-        ? Theme.of(context).colorScheme.onPrimary
-        : Theme.of(context).colorScheme.onPrimaryContainer;
   }
 }
