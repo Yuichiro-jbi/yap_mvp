@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../model/islander.dart';
 
 class ProfileHeader extends StatelessWidget {
@@ -11,56 +12,66 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final dateFormat = DateFormat.yMMMd();
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(
-          radius: 30,
-          child: Image.asset(
-            "assets/images/Vector.png",
-            width: 19.47,
-            height: 19.5,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                islander.name,
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Theme.of(context).primaryColor,
+              child: Text(
+                islander.name[0].toUpperCase(),
                 style: const TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 32,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
-              Row(
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    "assets/images/Vector.png",
-                    width: 16,
-                    height: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    "Joined March 2021",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                  Text(
+                    islander.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Text(
-                    "0 Friends",
+                  const SizedBox(height: 4),
+                  Text(
+                    'Level ${(islander.experience / 100).floor() + 1}',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(
+              Icons.calendar_today,
+              size: 16,
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Joined ${dateFormat.format(islander.createdAt)}',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+              ),
+            ),
+          ],
         ),
       ],
     );

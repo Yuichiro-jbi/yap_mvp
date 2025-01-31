@@ -29,11 +29,12 @@ class IslanderNotifier extends _$IslanderNotifier {
   /// - 完了レッスン: 空のリスト
   @override
   Islander build() {
-    return const Islander(
-      id: 'default-islander',
-      name: 'ゲスト島民',
+    return Islander(
+      id: 'test-user-id',
+      name: 'YAP君',
       experience: 0,
       sats: 0,
+      createdAt: DateTime(2025, 1, 1),
       completedLessonIds: [],
     );
   }
@@ -49,6 +50,16 @@ class IslanderNotifier extends _$IslanderNotifier {
     state = Islander(
       id: state.id,
       name: state.name,
+      experience: state.experience + experienceReward,
+      sats: state.sats + satsReward,
+      createdAt: state.createdAt,
+      completedLessonIds: [...state.completedLessonIds, lessonId],
+    );
+  }
+
+  /// レッスン完了時の報酬付与
+  void addRewards(int experienceReward, int satsReward, String lessonId) {
+    state = state.copyWith(
       experience: state.experience + experienceReward,
       sats: state.sats + satsReward,
       completedLessonIds: [...state.completedLessonIds, lessonId],

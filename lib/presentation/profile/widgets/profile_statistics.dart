@@ -11,41 +11,37 @@ class ProfileStatistics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      childAspectRatio: 1.5,
       children: [
-        const Text(
-          "Statistics",
-          style: TextStyle(
-            fontSize: 21,
-            fontWeight: FontWeight.w700,
-          ),
+        _StatItem(
+          icon: Icons.local_fire_department,
+          value: "1",
+          label: "Day streak",
+          color: Colors.orange,
         ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _StatItem(
-              icon: "assets/images/Vector.png",
-              value: "1",
-              label: "Day streak",
-            ),
-            _StatItem(
-              icon: "assets/images/Vector.png",
-              value: islander.experience.toString(),
-              label: "Total XP",
-            ),
-            _StatItem(
-              icon: "assets/images/Vector.png",
-              value: "Gold",
-              label: "League",
-            ),
-            _StatItem(
-              icon: "assets/images/Vector.png",
-              value: "0",
-              label: "Top 3 finishes",
-            ),
-          ],
+        _StatItem(
+          icon: Icons.flash_on,
+          value: islander.experience.toString(),
+          label: "Total XP",
+          color: Colors.yellow,
+        ),
+        _StatItem(
+          icon: Icons.workspace_premium,
+          value: "Gold",
+          label: "League",
+          color: Colors.amber,
+        ),
+        _StatItem(
+          icon: Icons.emoji_events,
+          value: "0",
+          label: "Top 3 finishes",
+          color: Colors.grey,
         ),
       ],
     );
@@ -53,41 +49,60 @@ class ProfileStatistics extends StatelessWidget {
 }
 
 class _StatItem extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String value;
   final String label;
+  final Color color;
 
   const _StatItem({
     required this.icon,
     required this.value,
     required this.label,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Image.asset(
-          icon,
-          width: 24,
-          height: 24,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

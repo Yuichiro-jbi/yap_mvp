@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-/// アプリのテーマカラーを提供するプロバイダー
-final appThemeProvider = Provider<AppTheme>((ref) => const AppTheme());
+part 'app_theme.g.dart';
+
+@riverpod
+class AppThemeNotifier extends _$AppThemeNotifier {
+  @override
+  AppTheme build() {
+    return const AppTheme(isDarkMode: false);
+  }
+
+  void toggleTheme() {
+    state = AppTheme(isDarkMode: !state.isDarkMode);
+  }
+}
 
 /// アプリのテーマを管理するクラス
 class AppTheme {
-  const AppTheme();
+  final bool isDarkMode;
+
+  const AppTheme({
+    required this.isDarkMode,
+  });
 
   /// メインのテーマデータ
   ThemeData get lightTheme {

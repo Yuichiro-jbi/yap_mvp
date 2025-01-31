@@ -10,6 +10,7 @@ class Islander with _$Islander {
     required String name,
     required int experience,
     required int sats,
+    required DateTime createdAt,
     @Default([]) List<String> completedLessonIds,
   }) = _Islander;
 

@@ -12,6 +12,7 @@ _$IslanderImpl _$$IslanderImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       experience: (json['experience'] as num).toInt(),
       sats: (json['sats'] as num).toInt(),
+      createdAt: DateTime.parse(json['createdAt'] as String),
       completedLessonIds: (json['completedLessonIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -24,5 +25,6 @@ Map<String, dynamic> _$$IslanderImplToJson(_$IslanderImpl instance) =>
       'name': instance.name,
       'experience': instance.experience,
       'sats': instance.sats,
+      'createdAt': instance.createdAt.toIso8601String(),
       'completedLessonIds': instance.completedLessonIds,
     };

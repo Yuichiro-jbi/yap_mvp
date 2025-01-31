@@ -6,7 +6,7 @@ part of 'islander_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$islanderNotifierHash() => r'6b8bb42e7c5d101448995175c22623c0bd135dcc';
+String _$islanderNotifierHash() => r'6b13e1c23ee73845f333a17a5a0b11c0a82f867d';
 
 /// IslanderProviderの責任範囲:
 /// 1. Islanderの状態管理
