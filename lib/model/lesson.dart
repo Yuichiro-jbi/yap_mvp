@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'question.dart';
 
 part 'lesson.freezed.dart';
 part 'lesson.g.dart';
@@ -16,17 +17,4 @@ class Lesson with _$Lesson {
   }) = _Lesson;
 
   factory Lesson.fromJson(Map<String, dynamic> json) => _$LessonFromJson(json);
-}
-
-@freezed
-class Question with _$Question {
-  const factory Question({
-    required String id,
-    required String question,
-    required List<String> options,
-    required int correctAnswerIndex,
-    required String explanation,
-  }) = _Question;
-
-  factory Question.fromJson(Map<String, dynamic> json) => _$QuestionFromJson(json);
 }

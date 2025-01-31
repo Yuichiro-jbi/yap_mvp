@@ -28,22 +28,3 @@ Map<String, dynamic> _$$LessonImplToJson(_$LessonImpl instance) =>
       'coinReward': instance.coinReward,
       'isCompleted': instance.isCompleted,
     };
-
-_$QuestionImpl _$$QuestionImplFromJson(Map<String, dynamic> json) =>
-    _$QuestionImpl(
-      id: json['id'] as String,
-      question: json['question'] as String,
-      options:
-          (json['options'] as List<dynamic>).map((e) => e as String).toList(),
-      correctAnswerIndex: (json['correctAnswerIndex'] as num).toInt(),
-      explanation: json['explanation'] as String,
-    );
-
-Map<String, dynamic> _$$QuestionImplToJson(_$QuestionImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'question': instance.question,
-      'options': instance.options,
-      'correctAnswerIndex': instance.correctAnswerIndex,
-      'explanation': instance.explanation,
-    };

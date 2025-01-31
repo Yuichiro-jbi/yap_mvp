@@ -66,7 +66,10 @@ class CongratulationsScreen extends StatelessWidget {
                 if (!isAllCorrect) ...[
                   const SizedBox(height: 16),
                   Text(
-                    '正解数: ${ref.read(lessonNotifierProvider.notifier).countCorrectAnswers(lesson.id, answers)} / ${lesson.questions.length}',
+                    '正解数: ${ref.read(lessonNotifierProvider.notifier).countCorrectAnswers(lesson.id, Map.fromIterables(
+                      lesson.questions.map((q) => q.id),
+                      answers,
+                    ))} / ${lesson.questions.length}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
