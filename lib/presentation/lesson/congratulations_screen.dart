@@ -60,7 +60,7 @@ class CongratulationsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  isAllCorrect ? 'レッスンを完璧にクリアしました！' : 'レッスンを終了しました',
+                  isAllCorrect ? 'レッスンをクリアしました！' : 'レッスンを終了しました',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 if (!isAllCorrect) ...[

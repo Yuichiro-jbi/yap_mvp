@@ -21,7 +21,7 @@ class ProfileHeader extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: const Color(0xFFFFB300), // ビットコインカラーを直接指定
               child: Text(
                 islander.name[0].toUpperCase(),
                 style: const TextStyle(

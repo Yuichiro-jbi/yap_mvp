@@ -22,6 +22,7 @@ Question _$QuestionFromJson(Map<String, dynamic> json) {
 mixin _$Question {
   String get id => throw _privateConstructorUsedError;
   String get question => throw _privateConstructorUsedError;
+  QuestionType get type => throw _privateConstructorUsedError;
   List<String> get options => throw _privateConstructorUsedError;
   int get correctAnswerIndex => throw _privateConstructorUsedError;
   String get explanation => throw _privateConstructorUsedError;
@@ -44,6 +45,7 @@ abstract class $QuestionCopyWith<$Res> {
   $Res call(
       {String id,
       String question,
+      QuestionType type,
       List<String> options,
       int correctAnswerIndex,
       String explanation});
@@ -66,6 +68,7 @@ class _$QuestionCopyWithImpl<$Res, $Val extends Question>
   $Res call({
     Object? id = null,
     Object? question = null,
+    Object? type = null,
     Object? options = null,
     Object? correctAnswerIndex = null,
     Object? explanation = null,
@@ -79,6 +82,10 @@ class _$QuestionCopyWithImpl<$Res, $Val extends Question>
           ? _value.question
           : question // ignore: cast_nullable_to_non_nullable
               as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as QuestionType,
       options: null == options
           ? _value.options
           : options // ignore: cast_nullable_to_non_nullable
@@ -106,6 +113,7 @@ abstract class _$$QuestionImplCopyWith<$Res>
   $Res call(
       {String id,
       String question,
+      QuestionType type,
       List<String> options,
       int correctAnswerIndex,
       String explanation});
@@ -126,6 +134,7 @@ class __$$QuestionImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? question = null,
+    Object? type = null,
     Object? options = null,
     Object? correctAnswerIndex = null,
     Object? explanation = null,
@@ -139,6 +148,10 @@ class __$$QuestionImplCopyWithImpl<$Res>
           ? _value.question
           : question // ignore: cast_nullable_to_non_nullable
               as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as QuestionType,
       options: null == options
           ? _value._options
           : options // ignore: cast_nullable_to_non_nullable
@@ -161,6 +174,7 @@ class _$QuestionImpl implements _Question {
   const _$QuestionImpl(
       {required this.id,
       required this.question,
+      required this.type,
       required final List<String> options,
       required this.correctAnswerIndex,
       required this.explanation})
@@ -173,6 +187,8 @@ class _$QuestionImpl implements _Question {
   final String id;
   @override
   final String question;
+  @override
+  final QuestionType type;
   final List<String> _options;
   @override
   List<String> get options {
@@ -188,7 +204,7 @@ class _$QuestionImpl implements _Question {
 
   @override
   String toString() {
-    return 'Question(id: $id, question: $question, options: $options, correctAnswerIndex: $correctAnswerIndex, explanation: $explanation)';
+    return 'Question(id: $id, question: $question, type: $type, options: $options, correctAnswerIndex: $correctAnswerIndex, explanation: $explanation)';
   }
 
   @override
@@ -199,6 +215,7 @@ class _$QuestionImpl implements _Question {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.question, question) ||
                 other.question == question) &&
+            (identical(other.type, type) || other.type == type) &&
             const DeepCollectionEquality().equals(other._options, _options) &&
             (identical(other.correctAnswerIndex, correctAnswerIndex) ||
                 other.correctAnswerIndex == correctAnswerIndex) &&
@@ -212,6 +229,7 @@ class _$QuestionImpl implements _Question {
       runtimeType,
       id,
       question,
+      type,
       const DeepCollectionEquality().hash(_options),
       correctAnswerIndex,
       explanation);
@@ -236,6 +254,7 @@ abstract class _Question implements Question {
   const factory _Question(
       {required final String id,
       required final String question,
+      required final QuestionType type,
       required final List<String> options,
       required final int correctAnswerIndex,
       required final String explanation}) = _$QuestionImpl;
@@ -247,6 +266,8 @@ abstract class _Question implements Question {
   String get id;
   @override
   String get question;
+  @override
+  QuestionType get type;
   @override
   List<String> get options;
   @override

@@ -24,24 +24,28 @@ class ProfileStatistics extends StatelessWidget {
           value: "1",
           label: "Day streak",
           color: Colors.orange,
+          borderColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[300]!,
         ),
         _StatItem(
           icon: Icons.flash_on,
           value: islander.experience.toString(),
           label: "Total XP",
           color: Colors.yellow,
+          borderColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[300]!,
         ),
         _StatItem(
-          icon: Icons.workspace_premium,
-          value: "Gold",
-          label: "League",
-          color: Colors.amber,
+          icon: Icons.currency_bitcoin,
+          value: "${islander.sats}",
+          label: "Total Sats",
+          color: const Color(0xFFFFB300),
+          borderColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[300]!,
         ),
         _StatItem(
           icon: Icons.emoji_events,
           value: "0",
           label: "Top 3 finishes",
           color: Colors.grey,
+          borderColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[300]!,
         ),
       ],
     );
@@ -53,21 +57,26 @@ class _StatItem extends StatelessWidget {
   final String value;
   final String label;
   final Color color;
+  final Color borderColor;
 
   const _StatItem({
     required this.icon,
     required this.value,
     required this.label,
     required this.color,
+    required this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: borderColor,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -76,6 +85,7 @@ class _StatItem extends StatelessWidget {
           ),
         ],
       ),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,

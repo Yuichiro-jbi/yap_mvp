@@ -26,6 +26,7 @@ mixin _$Islander {
   int get sats => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   List<String> get completedLessonIds => throw _privateConstructorUsedError;
+  int get dayStreak => throw _privateConstructorUsedError;
 
   /// Serializes this Islander to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,7 +49,8 @@ abstract class $IslanderCopyWith<$Res> {
       int experience,
       int sats,
       DateTime createdAt,
-      List<String> completedLessonIds});
+      List<String> completedLessonIds,
+      int dayStreak});
 }
 
 /// @nodoc
@@ -72,6 +74,7 @@ class _$IslanderCopyWithImpl<$Res, $Val extends Islander>
     Object? sats = null,
     Object? createdAt = null,
     Object? completedLessonIds = null,
+    Object? dayStreak = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -98,6 +101,10 @@ class _$IslanderCopyWithImpl<$Res, $Val extends Islander>
           ? _value.completedLessonIds
           : completedLessonIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      dayStreak: null == dayStreak
+          ? _value.dayStreak
+          : dayStreak // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -116,7 +123,8 @@ abstract class _$$IslanderImplCopyWith<$Res>
       int experience,
       int sats,
       DateTime createdAt,
-      List<String> completedLessonIds});
+      List<String> completedLessonIds,
+      int dayStreak});
 }
 
 /// @nodoc
@@ -138,6 +146,7 @@ class __$$IslanderImplCopyWithImpl<$Res>
     Object? sats = null,
     Object? createdAt = null,
     Object? completedLessonIds = null,
+    Object? dayStreak = null,
   }) {
     return _then(_$IslanderImpl(
       id: null == id
@@ -164,6 +173,10 @@ class __$$IslanderImplCopyWithImpl<$Res>
           ? _value._completedLessonIds
           : completedLessonIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      dayStreak: null == dayStreak
+          ? _value.dayStreak
+          : dayStreak // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -177,7 +190,8 @@ class _$IslanderImpl implements _Islander {
       required this.experience,
       required this.sats,
       required this.createdAt,
-      final List<String> completedLessonIds = const []})
+      final List<String> completedLessonIds = const [],
+      this.dayStreak = 0})
       : _completedLessonIds = completedLessonIds;
 
   factory _$IslanderImpl.fromJson(Map<String, dynamic> json) =>
@@ -204,8 +218,12 @@ class _$IslanderImpl implements _Islander {
   }
 
   @override
+  @JsonKey()
+  final int dayStreak;
+
+  @override
   String toString() {
-    return 'Islander(id: $id, name: $name, experience: $experience, sats: $sats, createdAt: $createdAt, completedLessonIds: $completedLessonIds)';
+    return 'Islander(id: $id, name: $name, experience: $experience, sats: $sats, createdAt: $createdAt, completedLessonIds: $completedLessonIds, dayStreak: $dayStreak)';
   }
 
   @override
@@ -221,13 +239,22 @@ class _$IslanderImpl implements _Islander {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             const DeepCollectionEquality()
-                .equals(other._completedLessonIds, _completedLessonIds));
+                .equals(other._completedLessonIds, _completedLessonIds) &&
+            (identical(other.dayStreak, dayStreak) ||
+                other.dayStreak == dayStreak));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, experience, sats,
-      createdAt, const DeepCollectionEquality().hash(_completedLessonIds));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      experience,
+      sats,
+      createdAt,
+      const DeepCollectionEquality().hash(_completedLessonIds),
+      dayStreak);
 
   /// Create a copy of Islander
   /// with the given fields replaced by the non-null parameter values.
@@ -252,7 +279,8 @@ abstract class _Islander implements Islander {
       required final int experience,
       required final int sats,
       required final DateTime createdAt,
-      final List<String> completedLessonIds}) = _$IslanderImpl;
+      final List<String> completedLessonIds,
+      final int dayStreak}) = _$IslanderImpl;
 
   factory _Islander.fromJson(Map<String, dynamic> json) =
       _$IslanderImpl.fromJson;
@@ -269,6 +297,8 @@ abstract class _Islander implements Islander {
   DateTime get createdAt;
   @override
   List<String> get completedLessonIds;
+  @override
+  int get dayStreak;
 
   /// Create a copy of Islander
   /// with the given fields replaced by the non-null parameter values.

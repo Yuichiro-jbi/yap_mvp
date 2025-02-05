@@ -34,12 +34,13 @@ class IslanderNotifier extends _$IslanderNotifier {
       name: 'YAP君',
       experience: 0,
       sats: 0,
+      dayStreak: 1,
       createdAt: DateTime(2025, 1, 1),
       completedLessonIds: [],
     );
   }
 
-  /// レッスン完了時の報酬付与処理
+  /// レッスン完了時の処理
   /// - 経験値を加算
   /// - Satsを加算
   /// - 完了レッスンリストに追加
@@ -47,12 +48,10 @@ class IslanderNotifier extends _$IslanderNotifier {
   /// @param experienceReward 獲得経験値
   /// @param satsReward 獲得Sats
   void completeLesson(String lessonId, int experienceReward, int satsReward) {
-    state = Islander(
-      id: state.id,
-      name: state.name,
+    state = state.copyWith(
       experience: state.experience + experienceReward,
       sats: state.sats + satsReward,
-      createdAt: state.createdAt,
+      dayStreak: state.dayStreak,
       completedLessonIds: [...state.completedLessonIds, lessonId],
     );
   }

@@ -17,6 +17,7 @@ _$IslanderImpl _$$IslanderImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      dayStreak: (json['dayStreak'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$IslanderImplToJson(_$IslanderImpl instance) =>
@@ -27,4 +28,5 @@ Map<String, dynamic> _$$IslanderImplToJson(_$IslanderImpl instance) =>
       'sats': instance.sats,
       'createdAt': instance.createdAt.toIso8601String(),
       'completedLessonIds': instance.completedLessonIds,
+      'dayStreak': instance.dayStreak,
     };

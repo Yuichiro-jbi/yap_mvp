@@ -15,7 +15,7 @@ class MainScaffold extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
-        height: 60,
+        height: 80,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
@@ -26,22 +26,27 @@ class MainScaffold extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
           children: [
-            _buildNavItem(
-              context,
-              index: 0,
-              isSelected: _calculateSelectedIndex(context) == 0,
-              icon: Icons.home_outlined,
-              selectedIcon: Icons.home,
-            ),
-            _buildNavItem(
-              context,
-              index: 1,
-              isSelected: _calculateSelectedIndex(context) == 1,
-              icon: Icons.person_outline,
-              selectedIcon: Icons.person,
+            const SizedBox(height: 12),  
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildNavItem(
+                  context,
+                  index: 0,
+                  isSelected: _calculateSelectedIndex(context) == 0,
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home,
+                ),
+                _buildNavItem(
+                  context,
+                  index: 1,
+                  isSelected: _calculateSelectedIndex(context) == 1,
+                  icon: Icons.person_outline,
+                  selectedIcon: Icons.person,
+                ),
+              ],
             ),
           ],
         ),
@@ -56,19 +61,19 @@ class MainScaffold extends StatelessWidget {
     required IconData icon,
     required IconData selectedIcon,
   }) {
-    final color = isSelected 
+    final color = isSelected
         ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+        : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return InkWell(
       onTap: () => _onItemTapped(index, context),
       child: Container(
         width: 60,
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.only(bottom: 0),  
         child: Icon(
           isSelected ? selectedIcon : icon,
           color: color,
-          size: 32,
+          size: 30,  
         ),
       ),
     );

@@ -12,6 +12,7 @@ class Islander with _$Islander {
     required int sats,
     required DateTime createdAt,
     @Default([]) List<String> completedLessonIds,
+    @Default(0) int dayStreak,
   }) = _Islander;
 
   factory Islander.fromJson(Map<String, dynamic> json) => _$IslanderFromJson(json);
